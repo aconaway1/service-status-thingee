@@ -2,8 +2,11 @@ import requests
 from fastapi import FastAPI
 import yaml
 
+VERSION = 0.1
+
 ADSB_RECEIVERS_FILE = "adsb_receivers.yml"
 BLOGS_FILE = "blogs.yml"
+SYS_STATUS_FILE = "sys_status.yml"
 
 def load_adsb_receivers():
     with open(ADSB_RECEIVERS_FILE, encoding='utf8') as file:
@@ -12,6 +15,11 @@ def load_adsb_receivers():
     
 def load_blogs_info():
     with open(BLOGS_FILE, encoding='utf8') as file:
+        return yaml.safe_load(file)
+    
+    
+def load_sys_status_info():
+    with open(SYS_STATUS_FILE, encoding='utf8') as file:
         return yaml.safe_load(file)
     
 
@@ -46,9 +54,7 @@ def get_blogs_status():
             'status': status_code
         })
     return status_list
-            
-        
-
+       
 app = FastAPI()
 
 @app.get('/')
@@ -56,12 +62,13 @@ async def main():
     return {'state': 'whatever, man'}
 
 
-@app.get('/adsb_status')
+@app.get('/adsb')
 async def adsb_status():
-    return {'receivers': get_adsb_status()}
+    adsb_status = await get_adsb_status()
+    return {'receivers': adsb_status}
 
 
-@app.get('/adsb_status/{passed_receiver}')
+@app.get('/adsb/{passed_receiver}')
 async def adsb_status(passed_receiver: str):
     check = False
     all_receivers = load_adsb_receivers()
@@ -79,3 +86,8 @@ async def adsb_status(passed_receiver: str):
 @app.get('/blogs')
 async def blog_status():
     return {'blogs': get_blogs_status()}
+
+
+@app.get('/sys_status')
+async def sys_status():
+    return load_sys_status_info()
