@@ -3,9 +3,15 @@ from fastapi import FastAPI
 import yaml
 
 ADSB_RECEIVERS_FILE = "adsb_receivers.yml"
+BLOGS_FILE = "blogs.yml"
 
 def load_adsb_receivers():
     with open(ADSB_RECEIVERS_FILE, encoding='utf8') as file:
+        return yaml.safe_load(file)
+    
+    
+def load_blogs_info():
+    with open(BLOGS_FILE, encoding='utf8') as file:
         return yaml.safe_load(file)
     
 
@@ -25,6 +31,23 @@ def get_adsb_status(receivers: list = load_adsb_receivers()) -> list:
                 'data': json_data
             })
     return status_list
+
+
+def get_blogs_status():
+    status_list = []
+    for blog in load_blogs_info():
+        try:
+            r = requests.get(url=blog['url'])
+            status_code = r.status_code
+        except requests.ConnectTimeout as e:
+            status_code = 500
+        status_list.append({
+            'name': blog['name'],
+            'status': status_code
+        })
+    return status_list
+            
+        
 
 app = FastAPI()
 
@@ -51,3 +74,8 @@ async def adsb_status(passed_receiver: str):
     if not check:
         return {'state': 'None'}
     return {'receivers': get_adsb_status(receivers=receivers)}
+
+
+@app.get('/blogs')
+async def blog_status():
+    return {'blogs': get_blogs_status()}
