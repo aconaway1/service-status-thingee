@@ -64,8 +64,7 @@ async def main():
 
 @app.get('/adsb')
 async def adsb_status():
-    adsb_status = await get_adsb_status()
-    return {'receivers': adsb_status}
+    return {'receivers': get_adsb_status()}
 
 
 @app.get('/adsb/{passed_receiver}')
@@ -88,6 +87,6 @@ async def blog_status():
     return {'blogs': get_blogs_status()}
 
 
-@app.get('/sys_status')
-async def sys_status():
+@app.get('/status')
+async def status():
     return load_sys_status_info()
