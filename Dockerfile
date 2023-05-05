@@ -1,7 +1,7 @@
-from python:latest
+FROM python:latest
 WORKDIR /code
-copy requirements.txt /code/requirements.txt
-run pip install -r requirements.txt
-copy *.yml /code
-copy ./app/ /code/app
-cmd [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+COPY requirements.txt /code/requirements.txt
+RUN pip install -r requirements.txt
+COPY *.yml /code
+COPY ./app/ /code/app
+CMD [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
