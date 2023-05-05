@@ -1,12 +1,16 @@
 import requests
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 import yaml
+from jinja2 import Environment, FileSystemLoader
 
-VERSION = 0.1
+VERSION = 0.2
 
 ADSB_RECEIVERS_FILE = "adsb_receivers.yml"
 BLOGS_FILE = "blogs.yml"
 SYS_STATUS_FILE = "sys_status.yml"
+
+ADSB_TEMPLATE = "templates/adsb.j2"
 
 def load_adsb_receivers():
     with open(ADSB_RECEIVERS_FILE, encoding='utf8') as file:
@@ -90,3 +94,14 @@ async def blog_status():
 @app.get('/status')
 async def status():
     return load_sys_status_info()
+
+
+@app.get('/adsb_templated')
+async def adsb_template():
+    adsb_status = get_adsb_status()
+    
+    environment = Environment(loader=FileSystemLoader("templates/"))
+    template = environment.get_template("adsb.j2")
+    page = template.render(receivers=adsb_status)
+        
+    return HTMLResponse(status_code=200, content=page)

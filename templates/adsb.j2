@@ -1,0 +1,12 @@
+<HTML>
+    <HEAD>
+    </HEAD>
+    
+    <BODY>
+        <H2>ADSB Receivers</H2>
+        <table border=2>
+        {%- for receiver in receivers %}<tr><td>{{ receiver.address -}}</td><td>{{ receiver.data.aircraft_with_pos }} aircraft seen</td></tr>
+        {% endfor %}
+        </table>
+    </BODY>
+</HTML>
