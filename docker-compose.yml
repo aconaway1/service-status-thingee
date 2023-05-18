@@ -1,0 +1,7 @@
+version: '2'
+services:
+  sst1:
+    image: sst
+    ports:
+      - 8080:80
+      
