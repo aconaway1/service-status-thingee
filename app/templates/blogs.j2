@@ -1,0 +1,12 @@
+<HTML>
+    <HEAD>
+    </HEAD>
+    
+    <BODY>
+        <H2>Blogs</H2>
+        <table border=2>
+        {%- for blog in blogs %}<tr><td>{{ blog.name -}}</td><td>{{ blog.status }}</td></tr>
+        {% endfor %}
+        </table>
+    </BODY>
+</HTML>
