@@ -4,4 +4,11 @@ services:
     image: sst
     ports:
       - 8080:80
-      
+    networks:
+      - sst_net
+networks:
+  sst_net:
+    name: sst_net
+    ipam:
+      config:
+        - subnet: "172.16.0.0/24"
