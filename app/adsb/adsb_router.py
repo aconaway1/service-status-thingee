@@ -3,16 +3,35 @@ from fastapi.responses import HTMLResponse
 import yaml
 from jinja2 import Environment, FileSystemLoader
 import requests
+import psycopg2
 
 ADSB_TEMPLATE = "templates/adsb.j2"
-ADSB_RECEIVERS_FILE = "adsb_receivers.yml"
+# ADSB_RECEIVERS_FILE = "adsb_receivers.yml"
 HTML_TEMPLATES_DIR = "/code/app/templates/"
 
 INTERESTING_HEX_FILE = "interesting_calls.yml"
 
 def load_adsb_receivers():
-    with open(ADSB_RECEIVERS_FILE, encoding='utf8') as file:
-        return yaml.safe_load(file)
+    # with open(ADSB_RECEIVERS_FILE, encoding='utf8') as file:
+    #     return yaml.safe_load(file)
+    db_conn = psycopg2.connect(
+        host="servicestatusthingee-db-1",
+        database="adsb",
+        user="adsb_user",
+        password="adsb_pass"
+    )
+    cur = db_conn.cursor()
+    cur.execute("select id,name,address from adsb_receivers")
+    results = cur.fetchall()
+    
+    receiver_list = []
+    for receiver in results:
+        receiver_list.append({
+                              'name': receiver[1],
+                              'address': receiver[2]
+                              }
+                             )
+    return receiver_list
     
 def load_interesting_hex():
     with open(INTERESTING_HEX_FILE, encoding='utf8') as file:
@@ -55,6 +74,23 @@ async def adsb_template():
     page = template.render(receivers=adsb_status)
         
     return HTMLResponse(status_code=200, content=page)
+
+
+@adsb_router.get('/db')
+async def connect_to_db():
+    db_conn = psycopg2.connect(
+        host="servicestatusthingee-db-1",
+        database="adsb",
+        user="adsb_user",
+        password="adsb_pass"
+    )
+    cur = db_conn.cursor()
+    cur.execute("select * from adsb_receivers")
+    results = cur.fetchall()
+    return {
+        'adsb_receivers': results
+    }
+
 
 
 @adsb_router.get('/{passed_receiver}')

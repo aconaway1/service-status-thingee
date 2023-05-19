@@ -1,2 +1,36 @@
 * Show non-US planes in area
 * Alert on interesting callsigns
+
+
+* DB features
+    - create postgres container
+    - configure postgres users
+    - create db structure
+    - db persistence
+    + tweak app
+
+
+
+class adsb_receiver:
+    def __init__(self, name, address):
+        self.name : str = name
+        self.address : str = address
+
+    def __str__(self):
+        return name
+
+
+
+create database adsb;
+\c adsb;
+create table if not exists adsb_receivers (
+    id serial primary key,
+    name varchar ( 50 ) unique not null,
+    address varchar ( 15 ) unique not null
+);
+
+create user adsb_user with password 'adsb_pass';
+grant all privileges on adsb_receivers to adsb_user;
+
+insert into adsb_receivers values (DEFAULT, 'adsb1', 'x.x.x.x');
+insert into adsb_receivers values (DEFAULT, 'adsb2', 'x.x.x.x');

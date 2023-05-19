@@ -6,6 +6,19 @@ services:
       - 8080:80
     networks:
       - sst_net
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=example
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - sst_net
+
+volumes:
+  pgdata:
+
 networks:
   sst_net:
     name: sst_net

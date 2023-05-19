@@ -5,6 +5,7 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 from .blogs import blogs_router
 from .adsb import adsb_router
+import psycopg2
 
 VERSION = 0.2
 
@@ -35,3 +36,18 @@ async def main():
 @app.get('/status')
 async def status():
     return load_sys_status_info()
+
+@app.get('/db')
+async def connect_to_db():
+    db_conn = psycopg2.connect(
+        host="servicestatusthingee-db-1",
+        database="adsb",
+        user="adsb_user",
+        password="adsb_pass"
+    )
+    cur = db_conn.cursor()
+    cur.execute("select * from adsb_receivers")
+    results = cur.fetchall()
+    return {
+        'results': results
+    }
